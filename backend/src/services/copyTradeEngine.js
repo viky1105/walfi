@@ -58,17 +58,9 @@ async function processCopyTrade({ wallet, token, metadata }) {
       status: "READY",
     });
 
-    console.log(
-      "[Copy Engine] ✅ Paper trade saved for user:",
-      wallet.user_id,
-      "tracked_wallet_id:",
-      wallet.id,
-      "paperTradeId:",
-      paperTrade?.id,
-    );
-    console.log("[Copy Engine] Created paperTrade record:", paperTrade);
-
     executionQueue.addTrade(paperTrade);
+
+    console.log("[Copy Engine] ✅ Paper trade saved.");
   } catch (err) {
     console.error("[Copy Engine] ERROR:");
     console.error(err);

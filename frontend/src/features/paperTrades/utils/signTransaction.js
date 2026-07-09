@@ -1,4 +1,4 @@
-import { Transaction, VersionedTransaction } from "@solana/web3.js";
+import { VersionedTransaction } from "@solana/web3.js";
 
 function getBase64Payload(serializedTransaction) {
   if (typeof serializedTransaction === "string") {
@@ -40,25 +40,6 @@ function bytesToBase64(bytes) {
   return btoa(binary);
 }
 
-function deserializeSwapTransaction(payload) {
-  const bytes = base64ToBytes(payload);
-
-  try {
-    return VersionedTransaction.deserialize(bytes);
-  } catch (versionedError) {
-    try {
-      return Transaction.from(bytes);
-    } catch (legacyError) {
-      const error = new Error(
-        "Failed to deserialize swap transaction payload.",
-      );
-      error.versionedError = versionedError;
-      error.legacyError = legacyError;
-      throw error;
-    }
-  }
-}
-
 export async function signSwapTransaction(wallet, serializedTransaction) {
   if (!wallet?.connected) {
     throw new Error("Wallet is not connected.");
@@ -72,28 +53,9 @@ export async function signSwapTransaction(wallet, serializedTransaction) {
     );
   }
 
-  const transaction = deserializeSwapTransaction(payload);
+  const transaction = VersionedTransaction.deserialize(base64ToBytes(payload));
 
-  try {
-    const signed = await wallet.signTransaction(transaction);
-    return bytesToBase64(new Uint8Array(signed.serialize()));
-  } catch (error) {
-    console.error("Wallet signing failed", {
-      walletName: wallet.name,
-      transactionType: transaction.constructor.name,
-      payloadLength: payload.length,
-      error,
-    });
+  const signed = await wallet.signTransaction(transaction);
 
-    if (typeof wallet.signAllTransactions === "function") {
-      try {
-        const [signed] = await wallet.signAllTransactions([transaction]);
-        return bytesToBase64(new Uint8Array(signed.serialize()));
-      } catch (allError) {
-        console.error("Fallback signAllTransactions failed", allError);
-      }
-    }
-
-    throw error;
-  }
+  return bytesToBase64(new Uint8Array(signed.serialize()));
 }

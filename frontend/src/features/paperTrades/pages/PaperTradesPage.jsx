@@ -4,33 +4,15 @@ import { getPaperTrades } from "../api/paperTradeApi";
 import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import PaperTradeCard from "../components/PaperTradeCard";
 
-function getCurrentUserId() {
-  const token = localStorage.getItem("walfi_token");
-
-  if (!token) return null;
-
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-
-    return payload?.id || null;
-  } catch {
-    return null;
-  }
-}
-
 export default function PaperTradesPage() {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
-    setCurrentUserId(getCurrentUserId());
-
     async function load() {
       try {
         const data = await getPaperTrades();
-        console.log("PaperTrades API response:", data);
 
         setTrades(Array.isArray(data) ? data : []);
       } catch (err) {
@@ -55,14 +37,7 @@ export default function PaperTradesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-3xl font-bold">Paper Trades</h1>
-          {currentUserId ? (
-            <span className="text-sm text-slate-400">
-              Current user: {currentUserId}
-            </span>
-          ) : null}
-        </div>
+        <h1 className="text-3xl font-bold">Paper Trades</h1>
 
         {loading ? (
           <div className="rounded-xl border border-slate-700 bg-slate-900 p-8 text-center">

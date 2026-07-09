@@ -26,18 +26,18 @@ async function getPaperTrades(userId) {
   return data;
 }
 
-// async function updateStatus(id, updates) {
-//   const { data, error } = await supabase
-//     .from("paper_trades")
-//     .update(updates)
-//     .eq("id", id)
-//     .select()
-//     .single();
+async function updateStatus(id, updates) {
+  const { data, error } = await supabase
+    .from("paper_trades")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
 
-//   if (error) throw error;
+  if (error) throw error;
 
-//   return data;
-// }
+  return data;
+}
 async function getTrade(id, userId) {
   const { data, error } = await supabase
     .from("paper_trades")
