@@ -5,12 +5,12 @@ import useWalletLogin from "../hooks/useWalletLogin";
 
 import Container from "../../../shared/components/ui/Container/Container";
 import Card from "../../../shared/components/ui/Card/Card";
-import Button from "../../../shared/components/ui/Button/Button";
+
 import Logo from "../../../shared/components/ui/Logo/Logo";
 import { useEffect, useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import WalletMultiButton from "../../../shared/components/ui/WalletMultiButton/WalletMultiButton";
 
 export default function LoginPage() {
   const { login } = useWalletLogin();
@@ -18,15 +18,28 @@ export default function LoginPage() {
 
   const hasLoggedIn = useRef(false);
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey && !hasLoggedIn.current) {
-      hasLoggedIn.current = true;
-      login();
+    async function autoLogin() {
+      if (
+        wallet.connected &&
+        wallet.publicKey &&
+        wallet.signMessage &&
+        !hasLoggedIn.current
+      ) {
+        hasLoggedIn.current = true;
+
+        // Give Phantom a moment to finish connecting
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        await login();
+      }
     }
+
+    autoLogin();
 
     if (!wallet.connected) {
       hasLoggedIn.current = false;
     }
-  }, [wallet.connected, wallet.publicKey]);
+  }, [wallet.connected, wallet.publicKey, wallet.signMessage]);
   return (
     <Container>
       <div className="relative mx-auto flex min-h-screen max-w-7xl items-center justify-between gap-20 px-8">

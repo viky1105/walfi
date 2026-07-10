@@ -20,20 +20,20 @@ export default function useWalletLogin() {
     const challenge = await getChallenge(address);
     const encodedMessage = new TextEncoder().encode(challenge.message);
 
-    const signature = await wallet.signMessage(encodedMessage);
+    try {
+      const signature = await wallet.signMessage(encodedMessage);
 
-    console.log(wallet.publicKey?.toBase58());
+      const result = await verifySignature({
+        wallet: address,
+        message: challenge.message,
+        signature: bs58.encode(signature),
+      });
 
-    const result = await verifySignature({
-      wallet: address,
-
-      message: challenge.message,
-
-      signature: bs58.encode(signature),
-    });
-
-    localStorage.setItem("walfi_token", result.token);
-    navigate("/dashboard");
+      localStorage.setItem("walfi_token", result.token);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Sign message failed", err);
+    }
   }
 
   return {

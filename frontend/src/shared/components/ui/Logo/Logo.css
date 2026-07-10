@@ -1,13 +1,21 @@
-.walfi-logo{
+.walfi-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: white;
+  text-align: center;
+  margin-bottom: 24px;
+}
 
-    font-size:42px;
+.walfi-logo__mark {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
 
-    font-weight:800;
-
-    color:white;
-
-    text-align:center;
-
-    margin-bottom:24px;
-
+.walfi-logo__text {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
 }
