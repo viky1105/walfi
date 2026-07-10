@@ -134,7 +134,9 @@ export default function Sidebar() {
 
         <div className="border-t border-white/10 p-6">
           <div className="rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 p-5">
-            <p className="text-xs uppercase tracking-widest opacity-70">Status</p>
+            <p className="text-xs uppercase tracking-widest opacity-70">
+              Status
+            </p>
 
             <h2 className="mt-2 font-bold">Live</h2>
 
