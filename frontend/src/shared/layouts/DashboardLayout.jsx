@@ -20,7 +20,9 @@ export default function DashboardLayout({ children }) {
         }}
         className="flex-1 overflow-y-auto"
       >
-        <div className="mx-auto max-w-[1700px] p-10">{children}</div>
+        <div className="mx-auto max-w-[1700px] p-4 pt-16 sm:p-6 sm:pt-20 md:p-8 lg:p-10">
+          {children}
+        </div>
       </motion.main>
     </div>
   );
