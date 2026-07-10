@@ -42,7 +42,7 @@ export default function LoginPage() {
   }, [wallet.connected, wallet.publicKey, wallet.signMessage]);
   return (
     <Container>
-      <div className="relative mx-auto flex min-h-screen max-w-7xl items-center justify-between gap-20 px-8">
+      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center gap-10 px-4 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-20 lg:px-8">
         {/* Background Glow */}
 
         <div className="absolute left-0 top-0 h-[450px] w-[450px] rounded-full bg-violet-700/20 blur-[140px]" />
@@ -55,28 +55,28 @@ export default function LoginPage() {
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative flex-1"
+          className="relative w-full flex-1"
         >
           <Logo />
 
           <div className="mt-10">
-            <p className="text-sm uppercase tracking-[0.35em] text-violet-400">
+            <p className="text-xs uppercase tracking-[0.35em] text-violet-400 sm:text-sm">
               SOLANA COPY TRADING
             </p>
 
-            <h1 className="mt-5 text-6xl font-black leading-tight tracking-tight text-white">
+            <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
               Copy the smartest
               <br />
               wallets.
             </h1>
 
-            <p className="mt-8 max-w-xl text-lg leading-8 text-slate-400">
+            <p className="mt-6 max-w-xl text-base leading-7 text-slate-400 sm:mt-8 sm:text-lg sm:leading-8">
               Monitor elite Solana traders, receive live trading signals and
               execute copy trades with one click.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-5 sm:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-3 sm:gap-5">
             <Feature icon={<Activity size={22} />} title="Real-Time" />
 
             <Feature icon={<Zap size={22} />} title="Fast Signals" />
@@ -84,7 +84,7 @@ export default function LoginPage() {
             <Feature icon={<ShieldCheck size={22} />} title="Secure" />
           </div>
 
-          <div className="mt-16 flex gap-10">
+          <div className="mt-10 flex flex-col gap-6 sm:mt-16 sm:flex-row sm:gap-10">
             <Stat number="24/7" label="Monitoring" />
 
             <Stat number="Live" label="Signals" />
@@ -99,16 +99,16 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md self-center"
         >
           <Card className="border border-white/10 bg-white/5 backdrop-blur-2xl">
             <Logo />
 
-            <h2 className="mt-8 text-center text-3xl font-black text-white">
+            <h2 className="mt-8 text-center text-2xl font-black text-white sm:text-3xl">
               Welcome Back
             </h2>
 
-            <p className="mt-4 text-center text-slate-400">
+            <p className="mt-4 text-center text-sm text-slate-400 sm:text-base">
               Connect your wallet to access your dashboard.
             </p>
 
@@ -128,7 +128,7 @@ export default function LoginPage() {
 
 function Feature({ icon, title }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5">
       <div className="mb-3 text-violet-400">{icon}</div>
 
       <p className="font-semibold text-white">{title}</p>
@@ -139,9 +139,9 @@ function Feature({ icon, title }) {
 function Stat({ number, label }) {
   return (
     <div>
-      <h2 className="text-3xl font-black text-white">{number}</h2>
+      <h2 className="text-2xl font-black text-white sm:text-3xl">{number}</h2>
 
-      <p className="mt-1 text-slate-400">{label}</p>
+      <p className="mt-1 text-sm text-slate-400 sm:text-base">{label}</p>
     </div>
   );
 }
