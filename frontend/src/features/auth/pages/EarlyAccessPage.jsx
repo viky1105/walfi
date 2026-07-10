@@ -35,7 +35,10 @@ export default function EarlyAccessPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="mx-auto mt-10 max-w-2xl">
-            <label htmlFor="walletAddress" className="mb-2 block text-sm font-medium text-slate-300">
+            <label
+              htmlFor="walletAddress"
+              className="mb-2 block text-sm font-medium text-slate-300"
+            >
               Wallet Address
             </label>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -74,7 +77,9 @@ export default function EarlyAccessPage() {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-6 text-center shadow-2xl"
             >
-              <h2 className="text-2xl font-bold text-white">Wallet Registered</h2>
+              <h2 className="text-2xl font-bold text-white">
+                Wallet Registered
+              </h2>
               <p className="mt-3 text-slate-400">
                 Your wallet has been registered for early access.
               </p>
