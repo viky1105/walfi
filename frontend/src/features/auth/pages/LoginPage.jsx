@@ -85,11 +85,11 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-10 flex flex-col gap-6 sm:mt-16 sm:flex-row sm:gap-10">
-            <Stat number="24/7" label="Monitoring" />
+            {/* <Stat number="24/7" label="Monitoring" />
 
             <Stat number="Live" label="Signals" />
 
-            <Stat number="SOL" label="Native" />
+            <Stat number="SOL" label="Native" /> */}
           </div>
         </motion.div>
 
@@ -136,12 +136,12 @@ function Feature({ icon, title }) {
   );
 }
 
-function Stat({ number, label }) {
-  return (
-    <div>
-      <h2 className="text-2xl font-black text-white sm:text-3xl">{number}</h2>
+// function Stat({ number, label }) {
+//   return (
+//     <div>
+//       <h2 className="text-2xl font-black text-white sm:text-3xl">{number}</h2>
 
-      <p className="mt-1 text-sm text-slate-400 sm:text-base">{label}</p>
-    </div>
-  );
-}
+//       <p className="mt-1 text-sm text-slate-400 sm:text-base">{label}</p>
+//     </div>
+//   );
+// }
