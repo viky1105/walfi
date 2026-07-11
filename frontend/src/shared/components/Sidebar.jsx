@@ -8,6 +8,7 @@ import {
   ClipboardList,
   Menu,
   X,
+  BookOpen,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,10 +18,27 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    const handleChange = (event) => {
+      setIsMobile(event.matches);
+      if (!event.matches) {
+        setIsOpen(false);
+      }
+    };
+
+    handleChange(mediaQuery);
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   const items = [
     {
@@ -54,6 +72,11 @@ export default function Sidebar() {
       path: "/dashboard/paperTrades",
     },
     {
+      icon: BookOpen,
+      label: "Docs",
+      path: "/dashboard/docs",
+    },
+    {
       icon: Settings,
       label: "Settings",
       path: "/dashboard/settings",
@@ -85,7 +108,7 @@ export default function Sidebar() {
 
       <motion.aside
         initial={false}
-        animate={{ x: isOpen ? 0 : -320 }}
+        animate={{ x: isMobile ? (isOpen ? 0 : -320) : 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 24 }}
         className="fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-white/10 bg-black/90 backdrop-blur-2xl md:sticky md:translate-x-0 md:bg-black/20"
       >

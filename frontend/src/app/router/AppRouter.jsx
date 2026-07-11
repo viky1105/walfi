@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginPage from "../../features/auth/pages/LoginPage";
-import EarlyAccessPage from "../../features/auth/pages/EarlyAccessPage";
+import AccessPage from "../../features/auth/pages/AccessPage";
 import DashboardPage from "../../features/dashboard/pages/DashboardPage";
 import WalletDetailsPage from "../../features/wallets/pages/WalletDetailsPage";
 import PortfolioPage from "../../features/portfolio/pages/PortfolioPage";
@@ -11,12 +11,13 @@ import PaperTradesPage from "../../features/paperTrades/pages/PaperTradesPage";
 import WalletPage from "../../features/wallets/pages/WalletPage";
 import ActivityPage from "../../features/activity/pages/ActivityPage";
 import SettingsPage from "../../features/settings/pages/SettingsPage";
+import DocsPage from "../../features/docs/pages/DocsPage";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<EarlyAccessPage />} />
+        <Route path="/" element={<AccessPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/dashboard" element={<DashboardPage />} />
@@ -24,6 +25,7 @@ export default function AppRouter() {
         <Route path="/dashboard/wallets/:id" element={<WalletDetailsPage />} />
         <Route path="/dashboard/activity" element={<ActivityPage />} />
         <Route path="/dashboard/settings" element={<SettingsPage />} />
+        <Route path="/dashboard/docs" element={<DocsPage />} />
         <Route path="/dashboard/portfolio" element={<PortfolioPage />} />
         <Route
           path="/dashboard/portfolio/:id"
