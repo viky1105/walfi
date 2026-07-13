@@ -26,15 +26,17 @@ async function processCopyTrade({ wallet, token, metadata }) {
       return;
     }
 
-    const lamports = Math.floor(Number(settings.fixed_sol) * 1_000_000_000);
+    const lamports = Math.floor(Number(settings.fixed_sol || 0) * 1_000_000_000);
+    const slippageBps = Number(settings.slippage_bps || 50);
+    const executionWallet = settings.execution_wallet || wallet.wallet_address;
 
     console.log("[Copy Engine] Requesting Jupiter quote...");
 
-    const quote = await getQuote(SOL_MINT, token.mint, lamports);
+    const quote = await getQuote(SOL_MINT, token.mint, lamports, slippageBps);
 
     console.log("[Copy Engine] Quote received.");
 
-    const swap = await getSwapTransaction(quote, wallet.wallet_address);
+    const swap = await getSwapTransaction(quote, executionWallet);
 
     console.log("[Copy Engine] Swap transaction built.");
 

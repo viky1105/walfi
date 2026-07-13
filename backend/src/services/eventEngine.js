@@ -2,6 +2,9 @@ const activityRepository = require("../repositories/activityRepository");
 const walletRepository = require("../repositories/walletRepository");
 const tradeService = require("./tradeService");
 const tokenService = require("./tokenService");
+const alertService = require("./alertService");
+const telegramService = require("./telegramService");
+const copyService = require("./copyService");
 const { getIO } = require("../socket/socket");
 const { calculateBuyPrice } = require("./priceEngine");
 const copyTradeEngine = require("./copyTradeEngine");
@@ -62,6 +65,27 @@ async function processEvent(parsedTx) {
       amount: token.amount,
       signature: parsedTx.signature,
     });
+
+    const alert = await alertService.createAlert({
+      user_id: wallet.user_id,
+      title: `Swap detected for ${wallet.nickname}`,
+      message: `${metadata.symbol} swap detected from ${wallet.nickname} at ${new Date(parsedTx.timestamp).toLocaleString()}`,
+      is_read: false,
+    });
+
+    const userSettings = await copyService.getSettings(wallet.user_id);
+
+    if (userSettings?.telegram_chat_id) {
+      await telegramService.sendTelegramMessage(
+        userSettings.telegram_chat_id,
+        `*Walfi Alert*
+Tracked wallet *${wallet.nickname}* made a swap.
+Token: *${metadata.symbol}*
+Amount: *${token.amount}*
+Time: *${new Date(parsedTx.timestamp).toLocaleString()}*`,
+      );
+    }
+
     try {
       await copyTradeEngine.processCopyTrade({
         wallet,

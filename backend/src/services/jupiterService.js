@@ -2,7 +2,7 @@ const axios = require("axios");
 
 const JUPITER_API = "https://api.jup.ag/swap/v1";
 
-async function getQuote(inputMint, outputMint, amount) {
+async function getQuote(inputMint, outputMint, amount, slippageBps = 50) {
   if (inputMint === outputMint) {
     throw new Error(
       "Jupiter quote request invalid: inputMint and outputMint cannot be equal",
@@ -15,7 +15,7 @@ async function getQuote(inputMint, outputMint, amount) {
         inputMint,
         outputMint,
         amount,
-        slippageBps: 50,
+        slippageBps,
       },
     });
 
