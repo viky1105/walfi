@@ -75,16 +75,15 @@ async function getWalletById(userId, walletId) {
 
   return data;
 }
-async function getWalletByAddress(walletAddress) {
+async function getWalletsByAddress(walletAddress) {
   const { data, error } = await supabase
     .from("tracked_wallets")
     .select("*")
-    .eq("wallet_address", walletAddress)
-    .single();
+    .eq("wallet_address", walletAddress);
 
-  if (error) return null;
+  if (error) throw error;
 
-  return data;
+  return data || [];
 }
 
 module.exports = {
@@ -93,5 +92,5 @@ module.exports = {
   getAllActiveWallets,
   getWalletById,
   findWallet,
-  getWalletByAddress,
+  getWalletsByAddress,
 };

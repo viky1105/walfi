@@ -12,14 +12,38 @@ const copyTradeEngine = require("./copyTradeEngine");
 async function processEvent(parsedTx) {
   console.log("Parsed wallet:", parsedTx.wallet);
 
-  const wallet = await walletRepository.getWalletByAddress(parsedTx.wallet);
-  console.log("Tracked wallet from DB:", wallet);
-  if (!wallet) {
+  const wallets = await walletRepository.getWalletsByAddress(parsedTx.wallet);
+  console.log("Tracked wallets from DB:", wallets.length);
+  if (wallets.length === 0) {
     console.log("Wallet not tracked.");
 
     return;
   }
+
+  const results = await Promise.allSettled(
+    wallets.map((wallet) => processWalletEvent(wallet, parsedTx)),
+  );
+
+  for (const result of results) {
+    if (result.status === "rejected") {
+      console.error("Unable to process tracked-wallet event:", result.reason);
+    }
+  }
+
+  const io = getIO();
+
+  io.emit("wallet_activity", {
+    wallet: parsedTx.wallet,
+    signature: parsedTx.signature,
+    timestamp: parsedTx.timestamp,
+  });
+
+  console.log("📡 Live event emitted.");
+}
+
+async function processWalletEvent(wallet, parsedTx) {
   const alreadyProcessed = await activityRepository.activityExists(
+    wallet.id,
     parsedTx.signature,
   );
 
@@ -78,20 +102,23 @@ async function processEvent(parsedTx) {
     if (userSettings?.telegram_chat_id) {
       await telegramService.sendTelegramMessage(
         userSettings.telegram_chat_id,
-        `*Walfi Alert*
-Tracked wallet *${wallet.nickname}* made a swap.
-Token: *${metadata.symbol}*
-Amount: *${token.amount}*
-Time: *${new Date(parsedTx.timestamp).toLocaleString()}*`,
+        `Walfi alert\n\nTracked wallet ${wallet.nickname} made a swap.\nToken: ${metadata.symbol}\nAmount: ${token.amount}\nTime: ${new Date(parsedTx.timestamp).toLocaleString()}`,
       );
     }
 
     try {
-      await copyTradeEngine.processCopyTrade({
+      const copyTrade = await copyTradeEngine.processCopyTrade({
         wallet,
         token,
         metadata,
       });
+
+      if (copyTrade?.status === "ready" && userSettings?.telegram_chat_id) {
+        await telegramService.sendTelegramMessage(
+          userSettings.telegram_chat_id,
+          `Auto-copy prepared for ${metadata.symbol}. Open Walfi to review and sign the transaction with your connected wallet.`,
+        );
+      }
     } catch (err) {
       console.error("========== COPY TRADE ERROR ==========");
       console.error(err);
@@ -100,16 +127,7 @@ Time: *${new Date(parsedTx.timestamp).toLocaleString()}*`,
     }
   }
 
-  console.log("Activity created.");
-  const io = getIO();
-
-  io.emit("wallet_activity", {
-    wallet: wallet.nickname,
-    signature: parsedTx.signature,
-    timestamp: parsedTx.timestamp,
-  });
-
-  console.log("📡 Live event emitted.");
+  console.log(`Activity created for ${wallet.nickname}.`);
 }
 
 module.exports = {

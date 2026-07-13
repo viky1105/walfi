@@ -16,21 +16,31 @@ async function processCopyTrade({ wallet, token, metadata }) {
 
     if (!settings || !settings.enabled) {
       console.log("[Copy Engine] Copy trading disabled.");
-      return;
+      return { status: "skipped", reason: "Copy trading is disabled." };
     }
 
     if (token.mint === SOL_MINT) {
       console.log(
         "[Copy Engine] Skipping copy trade because token mint matches SOL mint.",
       );
-      return;
+      return { status: "skipped", reason: "SOL is not a copy-trade target." };
     }
 
     const lamports = Math.floor(
       Number(settings.fixed_sol || 0) * 1_000_000_000,
     );
     const slippageBps = Number(settings.slippage_bps || 50);
-    const executionWallet = settings.execution_wallet || wallet.wallet_address;
+    const executionWallet = settings.execution_wallet;
+
+    if (!executionWallet) {
+      console.warn("[Copy Engine] No execution wallet is connected for this user.");
+      return { status: "skipped", reason: "No execution wallet is connected." };
+    }
+
+    if (!Number.isFinite(lamports) || lamports <= 0) {
+      console.warn("[Copy Engine] Fixed SOL amount must be greater than zero.");
+      return { status: "skipped", reason: "Invalid fixed SOL amount." };
+    }
 
     console.log("[Copy Engine] Requesting Jupiter quote...");
 
@@ -65,9 +75,11 @@ async function processCopyTrade({ wallet, token, metadata }) {
     executionQueue.addTrade(paperTrade);
 
     console.log("[Copy Engine] ✅ Paper trade saved.");
+    return { status: "ready", paperTrade };
   } catch (err) {
     console.error("[Copy Engine] ERROR:");
     console.error(err);
+    return { status: "failed", reason: err.message };
   }
 }
 

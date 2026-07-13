@@ -4,12 +4,12 @@ import {
   saveSettings,
   generateLinkCode,
 } from "../api/settingsApi";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function CopySettingsForm() {
+  const { publicKey } = useWallet();
   const [settings, setSettings] = useState({
     enabled: false,
-    telegram_chat_id: "",
-    execution_wallet: "",
     fixed_sol: "0.1",
     slippage_bps: "50",
   });
@@ -19,6 +19,8 @@ export default function CopySettingsForm() {
   const [linkCodeData, setLinkCodeData] = useState(null);
   const [generatingCode, setGeneratingCode] = useState(false);
   const [linkMessage, setLinkMessage] = useState("");
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const executionWallet = publicKey?.toBase58() ?? "";
 
   useEffect(() => {
     async function load() {
@@ -26,11 +28,10 @@ export default function CopySettingsForm() {
         const data = await getSettings();
         setSettings({
           enabled: data?.enabled ?? false,
-          telegram_chat_id: data?.telegram_chat_id ?? "",
-          execution_wallet: data?.execution_wallet ?? "",
           fixed_sol: data?.fixed_sol?.toString() ?? "0.1",
           slippage_bps: data?.slippage_bps?.toString() ?? "50",
         });
+        setTelegramLinked(Boolean(data?.telegram_chat_id));
       } catch (err) {
         console.error(err);
       } finally {
@@ -48,12 +49,15 @@ export default function CopySettingsForm() {
     setMessage("");
 
     try {
+      if (!executionWallet) {
+        setMessage("Connect the wallet you use to sign copy trades before saving.");
+        return;
+      }
+
       await saveSettings({
         enabled: settings.enabled,
-        telegram_chat_id: settings.telegram_chat_id,
-        execution_wallet: settings.execution_wallet,
-        fixed_sol: parseFloat(settings.fixed_sol),
-        slippage_bps: parseInt(settings.slippage_bps, 10),
+        fixed_sol: Number(settings.fixed_sol),
+        slippage_bps: Number(settings.slippage_bps),
       });
       setMessage("Settings saved successfully.");
     } catch (err) {
@@ -84,16 +88,13 @@ export default function CopySettingsForm() {
         <div className="mt-6 rounded-3xl border border-violet-500/20 bg-violet-500/5 p-5 text-sm text-slate-200">
           <p className="font-semibold text-white">Link your Walfi account</p>
           <p className="mt-2 text-slate-400">
-            Generate a one-time Walfi link code, then send it to the shared
-            Telegram bot. The bot will link your Telegram chat to your Walfi
-            account.
+            Link your existing Walfi account to the official Walfi bot. You do
+            not need to create a bot or find a chat ID.
           </p>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-slate-400">
-            <li>Generate a link code and copy it to your clipboard.</li>
-            <li>Send the code to the shared Walfi Telegram bot.</li>
-            <li>
-              The bot will confirm your account link and allow wallet creation.
-            </li>
+            <li>Generate a short-lived link code.</li>
+            <li>Open the Walfi bot link, or send the code to the bot.</li>
+            <li>The bot confirms the secure account link.</li>
           </ol>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
@@ -105,7 +106,7 @@ export default function CopySettingsForm() {
                   const data = await generateLinkCode();
                   setLinkCodeData(data);
                   setLinkMessage(
-                    "Link code generated. Send it to the shared bot to link your account.",
+                    "Link code generated. Open the Walfi bot to finish linking.",
                   );
                 } catch (err) {
                   console.error(err);
@@ -129,6 +130,16 @@ export default function CopySettingsForm() {
                   Expires at:{" "}
                   {new Date(linkCodeData.expires_at).toLocaleString()}
                 </p>
+                {linkCodeData.bot_url && (
+                  <a
+                    href={linkCodeData.bot_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex rounded-xl bg-violet-600 px-4 py-2 font-semibold text-white transition hover:bg-violet-500"
+                  >
+                    Open Walfi bot
+                  </a>
+                )}
               </div>
             )}
           </div>
@@ -146,7 +157,7 @@ export default function CopySettingsForm() {
         <>
           <div className="grid gap-4 lg:grid-cols-2">
             <label className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
-              <span className="text-sm text-slate-400">Enable auto buy</span>
+              <span className="text-sm text-slate-400">Enable auto copy</span>
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -159,50 +170,33 @@ export default function CopySettingsForm() {
                   }
                   className="h-5 w-5 rounded border-slate-700 bg-slate-900"
                 />
-                <span className="text-sm text-white">Auto buy enabled</span>
+                <span className="text-sm text-white">Auto copy enabled</span>
               </div>
             </label>
 
-            <label className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
-              <span className="text-sm text-slate-400">Telegram chat ID</span>
-              <input
-                value={settings.telegram_chat_id}
-                onChange={(event) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    telegram_chat_id: event.target.value,
-                  }))
-                }
-                placeholder="123456789"
-                className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
-              />
-              <p className="text-sm text-slate-500">
-                Enter the chat ID for your Telegram bot or group. Use bot
-                getUpdates or a Telegram chat inspector to find this value.
+            <div className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+              <span className="text-sm text-slate-400">Telegram alerts</span>
+              <p className="font-semibold text-white">
+                {telegramLinked ? "Walfi bot linked" : "Walfi bot not linked"}
               </p>
-            </label>
+              <p className="text-sm text-slate-500">
+                Link the official Walfi bot above to receive tracked-wallet
+                swap alerts in Telegram.
+              </p>
+            </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <label className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
-              <span className="text-sm text-slate-400">Execution wallet</span>
-              <input
-                value={settings.execution_wallet}
-                onChange={(event) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    execution_wallet: event.target.value,
-                  }))
-                }
-                placeholder="Solana wallet address"
-                className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
-              />
-              <p className="text-sm text-slate-500">
-                Use the Solana wallet address that should fund auto-buy orders.
-                This wallet will execute trades when a tracked wallet swap is
-                found.
+            <div className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+              <span className="text-sm text-slate-400">Connected wallet</span>
+              <p className="break-all font-semibold text-white">
+                {executionWallet || "No wallet connected"}
               </p>
-            </label>
+              <p className="text-sm text-slate-500">
+                Walfi uses the signed-in wallet to prepare copy trades. It is
+                never entered manually or exposed to Telegram.
+              </p>
+            </div>
 
             <label className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
               <span className="text-sm text-slate-400">
@@ -246,9 +240,10 @@ export default function CopySettingsForm() {
               <p className="text-sm text-slate-400">How this works</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-400">
                 <li>• Wallet address is used for execution.</li>
-                <li>• Telegram chat ID sends swap alerts.</li>
+                <li>• The Walfi bot sends swap alerts.</li>
                 <li>• Fixed SOL determines order amount.</li>
                 <li>• Slippage is passed to Jupiter quotes.</li>
+                <li>• Your wallet signs every live transaction.</li>
               </ul>
             </div>
           </div>

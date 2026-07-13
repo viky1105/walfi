@@ -52,10 +52,11 @@ async function createActivity(activity) {
 
   return data;
 }
-async function activityExists(signature) {
+async function activityExists(walletId, signature) {
   const { count, error } = await supabase
     .from("wallet_activity")
     .select("*", { count: "exact", head: true })
+    .eq("wallet_id", walletId)
     .eq("signature", signature);
 
   if (error) throw error;
