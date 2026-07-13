@@ -18,6 +18,8 @@ async function saveSettings(userId, settings) {
     .upsert({
       user_id: userId,
       ...settings,
+    }, {
+      onConflict: "user_id",
     })
     .select()
     .single();
