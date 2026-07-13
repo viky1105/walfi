@@ -14,7 +14,9 @@ export default function AlertPanel() {
   }
 
   useEffect(() => {
-    loadAlerts();
+    queueMicrotask(() => {
+      void loadAlerts();
+    });
   }, []);
 
   return (

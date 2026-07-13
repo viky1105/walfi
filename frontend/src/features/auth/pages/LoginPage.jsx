@@ -39,7 +39,7 @@ export default function LoginPage() {
     if (!wallet.connected) {
       hasLoggedIn.current = false;
     }
-  }, [wallet.connected, wallet.publicKey, wallet.signMessage]);
+  }, [login, wallet.connected, wallet.publicKey, wallet.signMessage]);
   return (
     <Container>
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center gap-10 px-4 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-20 lg:px-8">

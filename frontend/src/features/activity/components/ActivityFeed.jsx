@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import ActivityCard from "./ActivityCard";
 import { getRecentActivity } from "../api/activityApi";
-import { useSocket } from "../../../shared/context/SocketContext";
+import { useSocket } from "../../../shared/context/useSocket";
 
 export default function ActivityFeed() {
   const [activities, setActivities] = useState([]);
@@ -19,7 +19,9 @@ export default function ActivityFeed() {
   }
 
   useEffect(() => {
-    loadActivity();
+    queueMicrotask(() => {
+      void loadActivity();
+    });
   }, []);
   useEffect(() => {
     socket.on("wallet_activity", async () => {

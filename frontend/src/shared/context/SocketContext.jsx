@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 import socket from "../hooks/useSocket";
 
 const SocketContext = createContext(socket);
@@ -9,6 +9,4 @@ export function SocketProvider({ children }) {
   );
 }
 
-export function useSocket() {
-  return useContext(SocketContext);
-}
+export { SocketContext };

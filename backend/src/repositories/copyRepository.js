@@ -27,7 +27,33 @@ async function saveSettings(userId, settings) {
   return data;
 }
 
+async function findSettingsByLinkCode(linkCode) {
+  const { data, error } = await supabase
+    .from("copy_settings")
+    .select("*")
+    .eq("link_code", linkCode)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data;
+}
+
+async function getSettingsByTelegramChatId(chatId) {
+  const { data, error } = await supabase
+    .from("copy_settings")
+    .select("*")
+    .eq("telegram_chat_id", chatId)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data;
+}
+
 module.exports = {
   getSettings,
   saveSettings,
+  findSettingsByLinkCode,
+  getSettingsByTelegramChatId,
 };

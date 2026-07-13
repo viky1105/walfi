@@ -5,7 +5,6 @@ import AddWalletForm from "../components/AddWalletForm";
 
 import { getWallets } from "../api/walletApi";
 import { getWalletScores } from "../api/scoreApi";
-import ScoreBadge from "../components/ScoreBadge";
 
 export default function WalletsPage() {
   const [wallets, setWallets] = useState([]);
@@ -20,7 +19,9 @@ export default function WalletsPage() {
   }
 
   useEffect(() => {
-    loadWallets();
+    queueMicrotask(() => {
+      void loadWallets();
+    });
   }, []);
 
   return (

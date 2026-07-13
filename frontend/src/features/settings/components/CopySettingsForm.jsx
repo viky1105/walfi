@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { getSettings, saveSettings } from "../api/settingsApi";
+import {
+  getSettings,
+  saveSettings,
+  generateLinkCode,
+} from "../api/settingsApi";
 
 export default function CopySettingsForm() {
   const [settings, setSettings] = useState({
@@ -12,6 +16,9 @@ export default function CopySettingsForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [linkCodeData, setLinkCodeData] = useState(null);
+  const [generatingCode, setGeneratingCode] = useState(false);
+  const [linkMessage, setLinkMessage] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -75,23 +82,59 @@ export default function CopySettingsForm() {
         </p>
 
         <div className="mt-6 rounded-3xl border border-violet-500/20 bg-violet-500/5 p-5 text-sm text-slate-200">
-          <p className="font-semibold text-white">Need help with Telegram?</p>
+          <p className="font-semibold text-white">Link your Walfi account</p>
           <p className="mt-2 text-slate-400">
-            Create a Telegram bot via BotFather, send it a message or add it to
-            a group, then use the bot API to retrieve the chat ID.
+            Generate a one-time Walfi link code, then send it to the shared
+            Telegram bot. The bot will link your Telegram chat to your Walfi
+            account.
           </p>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-slate-400">
+            <li>Generate a link code and copy it to your clipboard.</li>
+            <li>Send the code to the shared Walfi Telegram bot.</li>
             <li>
-              Create a bot with{" "}
-              <span className="font-semibold">@BotFather</span>.
+              The bot will confirm your account link and allow wallet creation.
             </li>
-            <li>Send a message to the bot or group chat.</li>
-            <li>
-              Use <span className="font-semibold">getUpdates</span> to find the
-              chat ID.
-            </li>
-            <li>Paste that chat ID into this form and save.</li>
           </ol>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={async () => {
+                setGeneratingCode(true);
+                setLinkMessage("");
+                try {
+                  const data = await generateLinkCode();
+                  setLinkCodeData(data);
+                  setLinkMessage(
+                    "Link code generated. Send it to the shared bot to link your account.",
+                  );
+                } catch (err) {
+                  console.error(err);
+                  setLinkMessage("Unable to generate link code.");
+                } finally {
+                  setGeneratingCode(false);
+                }
+              }}
+              disabled={generatingCode}
+              className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {generatingCode ? "Generating..." : "Generate link code"}
+            </button>
+            {linkCodeData && (
+              <div className="rounded-2xl border border-white/10 bg-slate-900 p-4 text-sm text-slate-200">
+                <p className="font-semibold text-white">Your link code</p>
+                <p className="my-2 break-all text-violet-200">
+                  {linkCodeData.code}
+                </p>
+                <p className="text-slate-400">
+                  Expires at:{" "}
+                  {new Date(linkCodeData.expires_at).toLocaleString()}
+                </p>
+              </div>
+            )}
+          </div>
+          {linkMessage && (
+            <p className="mt-3 text-sm text-slate-300">{linkMessage}</p>
+          )}
         </div>
       </div>
 

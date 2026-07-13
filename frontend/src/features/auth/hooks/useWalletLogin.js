@@ -1,19 +1,21 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import bs58 from "bs58";
 import { useNavigate } from "react-router-dom";
+import { useCallback } from "react";
 
 import { getChallenge, verifySignature } from "../api/authApi";
 
 export default function useWalletLogin() {
   const wallet = useWallet();
   const navigate = useNavigate();
-  async function login() {
-    if (!wallet.connected || !wallet.publicKey) {
+  const { connected, publicKey, signMessage } = wallet;
+  const login = useCallback(async () => {
+    if (!connected || !publicKey || !signMessage) {
       console.log("Wallet not connected");
       console.log("Login button clicked");
       return;
     }
-    const address = wallet.publicKey.toBase58();
+    const address = publicKey.toBase58();
 
     console.log("Wallet:", address);
 
@@ -21,7 +23,7 @@ export default function useWalletLogin() {
     const encodedMessage = new TextEncoder().encode(challenge.message);
 
     try {
-      const signature = await wallet.signMessage(encodedMessage);
+      const signature = await signMessage(encodedMessage);
 
       const result = await verifySignature({
         wallet: address,
@@ -34,7 +36,7 @@ export default function useWalletLogin() {
     } catch (err) {
       console.error("Sign message failed", err);
     }
-  }
+  }, [connected, navigate, publicKey, signMessage]);
 
   return {
     login,
