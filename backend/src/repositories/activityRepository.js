@@ -1,7 +1,11 @@
 const supabase = require("../config/supabase");
 const crypto = require("crypto");
 
-async function getRecentActivity(userId) {
+async function getRecentActivity(walletIds) {
+  if (!walletIds || walletIds.length === 0) {
+    return [];
+  }
+
   const { data, error } = await supabase
 
     .from("wallet_activity")
@@ -11,13 +15,12 @@ async function getRecentActivity(userId) {
             *,
             tracked_wallets (
                 nickname,
-                wallet_address,
-                user_id
+                wallet_address
             )
         `,
     )
 
-    .eq("tracked_wallets.user_id", userId)
+    .in("wallet_id", walletIds)
 
     .order("created_at", {
       ascending: false,
