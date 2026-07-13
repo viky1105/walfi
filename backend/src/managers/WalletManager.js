@@ -7,6 +7,7 @@ async function syncWallets() {
 
   const addresses = [...new Set(wallets.map((wallet) => wallet.wallet_address))];
 
+  console.log(`Syncing ${addresses.length} active wallet(s) to Helius.`);
   await heliusService.updateWebhook(addresses);
 }
 

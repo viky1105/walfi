@@ -3,11 +3,19 @@ const telegramService = require("../services/telegramService");
 
 exports.heliusWebhook = async (req, res) => {
   try {
-    await webhookService.processTransactions(req.body);
+    const transactions = Array.isArray(req.body) ? req.body : [];
+    console.log(`Helius webhook received ${transactions.length} transaction(s).`);
 
+    if (transactions.length === 0) {
+      return res.status(400).json({ message: "Expected a Helius transaction array." });
+    }
+
+    await webhookService.processTransactions(transactions);
+
+    console.log("Helius webhook processed successfully.");
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
+    console.error("Helius webhook processing failed:", err);
 
     res.sendStatus(500);
   }

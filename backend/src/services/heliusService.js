@@ -31,7 +31,9 @@ async function updateWebhook(accountAddresses) {
     webhookType: "enhanced",
   });
 
-  console.log(`Helius webhook synced with ${accountAddresses.length} wallet(s).`);
+  console.log(
+    `Helius webhook synced with ${accountAddresses.length} wallet(s) at ${required.WEBHOOK_URL}.`,
+  );
   return response.data;
 }
 
