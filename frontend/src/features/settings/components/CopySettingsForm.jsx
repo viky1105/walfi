@@ -73,6 +73,26 @@ export default function CopySettingsForm() {
           Configure your wallet, Telegram notifications, and auto-buy
           parameters.
         </p>
+
+        <div className="mt-6 rounded-3xl border border-violet-500/20 bg-violet-500/5 p-5 text-sm text-slate-200">
+          <p className="font-semibold text-white">Need help with Telegram?</p>
+          <p className="mt-2 text-slate-400">
+            Create a Telegram bot via BotFather, send it a message or add it to
+            a group, then use the bot API to retrieve the chat ID.
+          </p>
+          <ol className="mt-3 list-decimal space-y-2 pl-5 text-slate-400">
+            <li>
+              Create a bot with{" "}
+              <span className="font-semibold">@BotFather</span>.
+            </li>
+            <li>Send a message to the bot or group chat.</li>
+            <li>
+              Use <span className="font-semibold">getUpdates</span> to find the
+              chat ID.
+            </li>
+            <li>Paste that chat ID into this form and save.</li>
+          </ol>
+        </div>
       </div>
 
       {loading ? (
