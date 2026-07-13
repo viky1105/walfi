@@ -15,21 +15,26 @@ async function broadcastTrade(userId, tradeId, signedTransaction) {
     throw new Error("Trade is no longer executable.");
   }
 
-  await paperTradeRepository.updateStatus(tradeId, "EXECUTING");
+  await paperTradeRepository.updateStatus(tradeId, { status: "EXECUTING" });
 
-  const tx = VersionedTransaction.deserialize(
-    Buffer.from(signedTransaction, "base64"),
-  );
+  try {
+    const tx = VersionedTransaction.deserialize(
+      Buffer.from(signedTransaction, "base64"),
+    );
 
-  const signature = await connection.sendTransaction(tx);
+    const signature = await connection.sendTransaction(tx);
 
-  await connection.confirmTransaction(signature);
+    await connection.confirmTransaction(signature);
 
-  await paperTradeRepository.finishTrade(tradeId, signature);
+    await paperTradeRepository.finishTrade(tradeId, signature);
 
-  return {
-    signature,
-  };
+    return {
+      signature,
+    };
+  } catch (err) {
+    await paperTradeRepository.updateStatus(tradeId, { status: "FAILED" });
+    throw err;
+  }
 }
 
 module.exports = {

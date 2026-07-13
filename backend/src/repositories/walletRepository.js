@@ -12,6 +12,8 @@ async function createWallet(userId, walletAddress, nickname) {
         wallet_address: walletAddress,
 
         nickname,
+
+        is_active: true,
       },
     ])
 
@@ -86,6 +88,16 @@ async function getWalletsByAddress(walletAddress) {
   return data || [];
 }
 
+async function deleteWallet(userId, walletId) {
+  const { error } = await supabase
+    .from("tracked_wallets")
+    .delete()
+    .eq("id", walletId)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+}
+
 module.exports = {
   createWallet,
   getWallets,
@@ -93,4 +105,5 @@ module.exports = {
   getWalletById,
   findWallet,
   getWalletsByAddress,
+  deleteWallet,
 };

@@ -27,13 +27,11 @@ async function addWallet(userId, body) {
     wallet_address,
     nickname,
   );
-  // TODO:
-  // Sync wallets to Helius after deployment.
-  // During local development, this is optional.
   try {
     await walletManager.syncWallets();
   } catch (err) {
-    console.log("⚠️ Helius sync skipped:", err.message);
+    await walletRepository.deleteWallet(userId, wallet.id);
+    throw new Error(`Unable to start wallet monitoring: ${err.message}`);
   }
   return wallet;
 }

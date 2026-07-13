@@ -4,6 +4,13 @@ const { getSwapTransaction } = require("./jupiterSwapService");
 const paperTradeService = require("./paperTradeService");
 const { SOL_MINT } = require("../config/constants");
 const executionQueue = require("./executionQueue");
+const { Connection, PublicKey } = require("@solana/web3.js");
+
+const LAMPORTS_PER_SOL = 1_000_000_000;
+const FEE_RESERVE_LAMPORTS = 10_000_000; // 0.01 SOL for transaction and account-creation costs.
+const connection = process.env.SOLANA_RPC
+  ? new Connection(process.env.SOLANA_RPC, "confirmed")
+  : null;
 
 async function processCopyTrade({ wallet, token, metadata }) {
   try {
@@ -26,9 +33,8 @@ async function processCopyTrade({ wallet, token, metadata }) {
       return { status: "skipped", reason: "SOL is not a copy-trade target." };
     }
 
-    const lamports = Math.floor(
-      Number(settings.fixed_sol || 0) * 1_000_000_000,
-    );
+    const fixedSol = Number(settings.fixed_sol || 0);
+    const lamports = Math.floor(fixedSol * LAMPORTS_PER_SOL);
     const slippageBps = Number(settings.slippage_bps || 50);
     const executionWallet = settings.execution_wallet;
 
@@ -40,6 +46,34 @@ async function processCopyTrade({ wallet, token, metadata }) {
     if (!Number.isFinite(lamports) || lamports <= 0) {
       console.warn("[Copy Engine] Fixed SOL amount must be greater than zero.");
       return { status: "skipped", reason: "Invalid fixed SOL amount." };
+    }
+
+    if (!connection) {
+      return {
+        status: "failed",
+        reason: "Walfi cannot verify your SOL balance because SOLANA_RPC is not configured.",
+      };
+    }
+
+    let availableLamports;
+    try {
+      availableLamports = await connection.getBalance(
+        new PublicKey(executionWallet),
+        "confirmed",
+      );
+    } catch (err) {
+      return {
+        status: "failed",
+        reason: `Walfi could not check the connected wallet balance: ${err.message}`,
+      };
+    }
+
+    const requiredLamports = lamports + FEE_RESERVE_LAMPORTS;
+    if (availableLamports < requiredLamports) {
+      return {
+        status: "failed",
+        reason: `Insufficient SOL. Available: ${(availableLamports / LAMPORTS_PER_SOL).toFixed(4)} SOL. Required: at least ${(requiredLamports / LAMPORTS_PER_SOL).toFixed(4)} SOL, including a 0.01 SOL fee reserve.`,
+      };
     }
 
     console.log("[Copy Engine] Requesting Jupiter quote...");

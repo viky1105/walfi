@@ -118,6 +118,14 @@ async function processWalletEvent(wallet, parsedTx) {
           userSettings.telegram_chat_id,
           `Auto-copy prepared for ${metadata.symbol}. Open Walfi to review and sign the transaction with your connected wallet.`,
         );
+      } else if (
+        userSettings?.telegram_chat_id &&
+        (copyTrade?.status === "failed" || copyTrade?.status === "skipped")
+      ) {
+        await telegramService.sendTelegramMessage(
+          userSettings.telegram_chat_id,
+          `Auto-copy was not prepared for ${metadata.symbol}. Reason: ${copyTrade.reason}`,
+        );
       }
     } catch (err) {
       console.error("========== COPY TRADE ERROR ==========");

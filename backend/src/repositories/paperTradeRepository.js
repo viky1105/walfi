@@ -50,14 +50,6 @@ async function getTrade(id, userId) {
 
   return data;
 }
-async function updateStatus(id, status) {
-  return supabase
-    .from("paper_trades")
-    .update({
-      status,
-    })
-    .eq("id", id);
-}
 async function finishTrade(id, signature) {
   return supabase
     .from("paper_trades")
