@@ -58,15 +58,27 @@ export default function CopySettingsForm() {
   }
 
   return (
-    <form onSubmit={handleSave} className="space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+    <form
+      onSubmit={handleSave}
+      className="space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl"
+    >
       <div>
-        <p className="text-sm uppercase tracking-[0.25em] text-violet-400">Auto Buy Settings</p>
-        <h2 className="mt-2 text-3xl font-black text-white">Execution & Alerts</h2>
-        <p className="mt-3 text-slate-400">Configure your wallet, Telegram notifications, and auto-buy parameters.</p>
+        <p className="text-sm uppercase tracking-[0.25em] text-violet-400">
+          Auto Buy Settings
+        </p>
+        <h2 className="mt-2 text-3xl font-black text-white">
+          Execution & Alerts
+        </h2>
+        <p className="mt-3 text-slate-400">
+          Configure your wallet, Telegram notifications, and auto-buy
+          parameters.
+        </p>
       </div>
 
       {loading ? (
-        <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 text-slate-400">Loading settings...</div>
+        <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 text-slate-400">
+          Loading settings...
+        </div>
       ) : (
         <>
           <div className="grid gap-4 lg:grid-cols-2">
@@ -77,7 +89,10 @@ export default function CopySettingsForm() {
                   type="checkbox"
                   checked={settings.enabled}
                   onChange={(event) =>
-                    setSettings((prev) => ({ ...prev, enabled: event.target.checked }))
+                    setSettings((prev) => ({
+                      ...prev,
+                      enabled: event.target.checked,
+                    }))
                   }
                   className="h-5 w-5 rounded border-slate-700 bg-slate-900"
                 />
@@ -90,11 +105,18 @@ export default function CopySettingsForm() {
               <input
                 value={settings.telegram_chat_id}
                 onChange={(event) =>
-                  setSettings((prev) => ({ ...prev, telegram_chat_id: event.target.value }))
+                  setSettings((prev) => ({
+                    ...prev,
+                    telegram_chat_id: event.target.value,
+                  }))
                 }
                 placeholder="123456789"
                 className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
               />
+              <p className="text-sm text-slate-500">
+                Enter the chat ID for your Telegram bot or group. Use bot
+                getUpdates or a Telegram chat inspector to find this value.
+              </p>
             </label>
           </div>
 
@@ -104,22 +126,35 @@ export default function CopySettingsForm() {
               <input
                 value={settings.execution_wallet}
                 onChange={(event) =>
-                  setSettings((prev) => ({ ...prev, execution_wallet: event.target.value }))
+                  setSettings((prev) => ({
+                    ...prev,
+                    execution_wallet: event.target.value,
+                  }))
                 }
                 placeholder="Solana wallet address"
                 className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
               />
+              <p className="text-sm text-slate-500">
+                Use the Solana wallet address that should fund auto-buy orders.
+                This wallet will execute trades when a tracked wallet swap is
+                found.
+              </p>
             </label>
 
             <label className="space-y-2 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
-              <span className="text-sm text-slate-400">Fixed order size (SOL)</span>
+              <span className="text-sm text-slate-400">
+                Fixed order size (SOL)
+              </span>
               <input
                 type="number"
                 min="0"
                 step="0.01"
                 value={settings.fixed_sol}
                 onChange={(event) =>
-                  setSettings((prev) => ({ ...prev, fixed_sol: event.target.value }))
+                  setSettings((prev) => ({
+                    ...prev,
+                    fixed_sol: event.target.value,
+                  }))
                 }
                 className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
               />
@@ -135,7 +170,10 @@ export default function CopySettingsForm() {
                 max="500"
                 value={settings.slippage_bps}
                 onChange={(event) =>
-                  setSettings((prev) => ({ ...prev, slippage_bps: event.target.value }))
+                  setSettings((prev) => ({
+                    ...prev,
+                    slippage_bps: event.target.value,
+                  }))
                 }
                 className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
               />

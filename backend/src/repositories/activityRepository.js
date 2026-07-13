@@ -11,10 +11,13 @@ async function getRecentActivity(userId) {
             *,
             tracked_wallets (
                 nickname,
-                wallet_address
+                wallet_address,
+                user_id
             )
         `,
     )
+
+    .eq("tracked_wallets.user_id", userId)
 
     .order("created_at", {
       ascending: false,
