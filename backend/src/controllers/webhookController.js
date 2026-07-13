@@ -1,24 +1,22 @@
 const webhookService = require("../services/webhookService");
 const telegramService = require("../services/telegramService");
 
-exports.heliusWebhook = async (req, res) => {
-  try {
-    const transactions = Array.isArray(req.body) ? req.body : [];
-    console.log(`Helius webhook received ${transactions.length} transaction(s).`);
+exports.heliusWebhook = (req, res) => {
+  const transactions = Array.isArray(req.body) ? req.body : [];
+  console.log(`Helius webhook received ${transactions.length} transaction(s).`);
 
-    if (transactions.length === 0) {
-      return res.status(400).json({ message: "Expected a Helius transaction array." });
-    }
-
-    await webhookService.processTransactions(transactions);
-
-    console.log("Helius webhook processed successfully.");
-    res.sendStatus(200);
-  } catch (err) {
-    console.error("Helius webhook processing failed:", err);
-
-    res.sendStatus(500);
+  if (transactions.length === 0) {
+    return res.status(400).json({ message: "Expected a Helius transaction array." });
   }
+
+  // Helius requires a successful acknowledgement within one second. The
+  // transaction work can involve external APIs, so handle it after replying.
+  res.sendStatus(200);
+
+  void webhookService
+    .processTransactions(transactions)
+    .then(() => console.log("Helius webhook processed successfully."))
+    .catch((err) => console.error("Helius webhook processing failed:", err));
 };
 
 exports.telegramWebhook = async (req, res) => {
