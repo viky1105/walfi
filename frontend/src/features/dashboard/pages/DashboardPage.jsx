@@ -38,3 +38,5 @@ export default function DashboardPage() {
     </DashboardLayout>
   );
 }
+
+dynamic hour noodle rate plug dash soda access stand proud minimum tree

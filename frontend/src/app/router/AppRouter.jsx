@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginPage from "../../features/auth/pages/LoginPage";
-import AccessPage from "../../features/auth/pages/AccessPage";
 import DashboardPage from "../../features/dashboard/pages/DashboardPage";
 import WalletDetailsPage from "../../features/wallets/pages/WalletDetailsPage";
 import PortfolioPage from "../../features/portfolio/pages/PortfolioPage";
@@ -17,7 +16,7 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AccessPage />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/dashboard" element={<DashboardPage />} />
