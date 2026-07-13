@@ -26,7 +26,9 @@ async function processCopyTrade({ wallet, token, metadata }) {
       return;
     }
 
-    const lamports = Math.floor(Number(settings.fixed_sol || 0) * 1_000_000_000);
+    const lamports = Math.floor(
+      Number(settings.fixed_sol || 0) * 1_000_000_000,
+    );
     const slippageBps = Number(settings.slippage_bps || 50);
     const executionWallet = settings.execution_wallet || wallet.wallet_address;
 
