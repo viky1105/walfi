@@ -45,3 +45,13 @@ exports.getWallet = async (req, res) => {
     });
   }
 };
+
+exports.deleteWallet = async (req, res) => {
+  try {
+    await walletService.deleteWallet(req.user.id, req.params.id);
+    res.sendStatus(204);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};

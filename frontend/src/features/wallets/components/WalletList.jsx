@@ -1,6 +1,6 @@
 import WalletCard from "./WalletCard";
 
-export default function WalletList({ wallets, scores }) {
+export default function WalletList({ wallets, scores, onWalletDeleted }) {
   if (!wallets.length) {
     return <div className="text-slate-400">No tracked wallets yet.</div>;
   }
@@ -10,7 +10,14 @@ export default function WalletList({ wallets, scores }) {
       {wallets.map((wallet) => {
         const score = scores.find((s) => s.id === wallet.id);
 
-        return <WalletCard key={wallet.id} wallet={wallet} score={score} />;
+        return (
+          <WalletCard
+            key={wallet.id}
+            wallet={wallet}
+            score={score}
+            onWalletDeleted={onWalletDeleted}
+          />
+        );
       })}
     </div>
   );

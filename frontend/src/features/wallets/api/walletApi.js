@@ -15,3 +15,7 @@ export async function getWallet(id) {
 
   return data;
 }
+
+export async function deleteWallet(id) {
+  await api.delete(`/wallets/${id}`);
+}

@@ -61,10 +61,21 @@ async function finishTrade(id, signature) {
     .eq("id", id);
 }
 
+async function deletePaperTradesByTrackedWallet(userId, walletId) {
+  const { error } = await supabase
+    .from("paper_trades")
+    .delete()
+    .eq("user_id", userId)
+    .eq("tracked_wallet_id", walletId);
+
+  if (error) throw error;
+}
+
 module.exports = {
   createPaperTrade,
   getPaperTrades,
   updateStatus,
   getTrade,
   finishTrade,
+  deletePaperTradesByTrackedWallet,
 };

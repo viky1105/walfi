@@ -45,7 +45,11 @@ export default function WalletsPage() {
 
       <AddWalletForm onWalletAdded={loadWallets} />
 
-      <WalletList wallets={wallets} scores={scores} />
+      <WalletList
+        wallets={wallets}
+        scores={scores}
+        onWalletDeleted={loadWallets}
+      />
     </div>
   );
 }

@@ -9,6 +9,14 @@ const { getIO } = require("../socket/socket");
 const { calculateBuyPrice } = require("./priceEngine");
 const copyTradeEngine = require("./copyTradeEngine");
 
+function getTokenLabel(metadata) {
+  if (metadata.name && metadata.name !== metadata.symbol) {
+    return `${metadata.name} (${metadata.symbol})`;
+  }
+
+  return metadata.symbol;
+}
+
 async function processEvent(parsedTx) {
   console.log("Parsed wallet:", parsedTx.wallet);
 
@@ -63,10 +71,11 @@ async function processWalletEvent(wallet, parsedTx) {
 
   for (const token of tradableTokens) {
     const metadata = await tokenService.getMetadata(token.mint);
+    const tokenLabel = getTokenLabel(metadata);
     const buyPrice = calculateBuyPrice(parsedTx);
     const activity = {
       walletId: wallet.id,
-      tokenSymbol: metadata.symbol,
+      tokenSymbol: tokenLabel,
       contractAddress: token.mint,
       side: "BUY",
       amount: token.amount,
@@ -83,7 +92,7 @@ async function processWalletEvent(wallet, parsedTx) {
 
     await tradeService.createTrade({
       userId: wallet.user_id,
-      tokenSymbol: metadata.symbol,
+      tokenSymbol: tokenLabel,
       contractAddress: token.mint,
       buyPrice,
       amount: token.amount,
@@ -92,8 +101,9 @@ async function processWalletEvent(wallet, parsedTx) {
 
     const alert = await alertService.createAlert({
       user_id: wallet.user_id,
+      tracked_wallet_id: wallet.id,
       title: `Swap detected for ${wallet.nickname}`,
-      message: `${metadata.symbol} swap detected from ${wallet.nickname} at ${new Date(parsedTx.timestamp).toLocaleString()}`,
+      message: `${tokenLabel} swap detected from ${wallet.nickname} at ${new Date(parsedTx.timestamp).toLocaleString()}`,
       is_read: false,
     });
 
@@ -102,7 +112,7 @@ async function processWalletEvent(wallet, parsedTx) {
     if (userSettings?.telegram_chat_id) {
       await telegramService.sendTelegramMessage(
         userSettings.telegram_chat_id,
-        `Walfi alert\n\nTracked wallet ${wallet.nickname} made a swap.\nToken: ${metadata.symbol}\nAmount: ${token.amount}\nTime: ${new Date(parsedTx.timestamp).toLocaleString()}`,
+        `Walfi alert\n\nTracked wallet ${wallet.nickname} made a swap.\nToken: ${tokenLabel}\nAmount: ${token.amount}\nTime: ${new Date(parsedTx.timestamp).toLocaleString()}`,
       );
     }
 
@@ -116,7 +126,7 @@ async function processWalletEvent(wallet, parsedTx) {
       if (copyTrade?.status === "ready" && userSettings?.telegram_chat_id) {
         await telegramService.sendTelegramMessage(
           userSettings.telegram_chat_id,
-          `Auto-copy prepared for ${metadata.symbol}. Open Walfi to review and sign the transaction with your connected wallet.`,
+          `Auto-copy prepared for ${tokenLabel}. Open Walfi to review and sign the transaction with your connected wallet.`,
         );
       } else if (
         userSettings?.telegram_chat_id &&
@@ -124,7 +134,7 @@ async function processWalletEvent(wallet, parsedTx) {
       ) {
         await telegramService.sendTelegramMessage(
           userSettings.telegram_chat_id,
-          `Auto-copy was not prepared for ${metadata.symbol}. Reason: ${copyTrade.reason}`,
+          `Auto-copy was not prepared for ${tokenLabel}. Reason: ${copyTrade.reason}`,
         );
       }
     } catch (err) {

@@ -40,8 +40,29 @@ async function markAsRead(alertId, userId) {
   return data;
 }
 
+async function deleteAlertsByWallet(userId, walletId, walletNickname) {
+  const { error: linkedAlertsError } = await supabase
+    .from("alerts")
+    .delete()
+    .eq("user_id", userId)
+    .eq("tracked_wallet_id", walletId);
+
+  if (linkedAlertsError) throw linkedAlertsError;
+
+  // Remove alerts created before tracked_wallet_id was introduced.
+  const { error: legacyAlertsError } = await supabase
+    .from("alerts")
+    .delete()
+    .eq("user_id", userId)
+    .is("tracked_wallet_id", null)
+    .eq("title", `Swap detected for ${walletNickname}`);
+
+  if (legacyAlertsError) throw legacyAlertsError;
+}
+
 module.exports = {
   createAlert,
   getAlerts,
   markAsRead,
+  deleteAlertsByWallet,
 };

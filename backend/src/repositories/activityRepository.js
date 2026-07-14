@@ -64,8 +64,18 @@ async function activityExists(walletId, signature) {
   return count > 0;
 }
 
+async function deleteActivitiesByWalletId(walletId) {
+  const { error } = await supabase
+    .from("wallet_activity")
+    .delete()
+    .eq("wallet_id", walletId);
+
+  if (error) throw error;
+}
+
 module.exports = {
   getRecentActivity,
   createActivity,
   activityExists,
+  deleteActivitiesByWalletId,
 };

@@ -1,10 +1,34 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight, Circle, Wallet } from "lucide-react";
+import { ArrowUpRight, Circle, Trash2, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import ScoreBadge from "./ScoreBadge";
+import { deleteWallet } from "../api/walletApi";
 
-export default function WalletCard({ wallet, score }) {
+export default function WalletCard({ wallet, score, onWalletDeleted }) {
   const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(event) {
+    event.stopPropagation();
+
+    const confirmed = window.confirm(
+      `Delete ${wallet.nickname} and all of its activity, alerts, and prepared copy trades? This cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      await deleteWallet(wallet.id);
+      await onWalletDeleted();
+    } catch (err) {
+      console.error("Unable to delete wallet.", err);
+      window.alert("Unable to delete this wallet. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <motion.div
@@ -40,7 +64,18 @@ export default function WalletCard({ wallet, score }) {
             </div>
           </div>
 
-          <ArrowUpRight className="opacity-30 transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:opacity-100" />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              aria-label={`Delete ${wallet.nickname}`}
+              className="rounded-xl p-2 text-slate-400 transition hover:bg-red-500/15 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Trash2 size={18} />
+            </button>
+            <ArrowUpRight className="opacity-30 transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:opacity-100" />
+          </div>
         </div>
 
         <div className="mt-6 rounded-2xl bg-black/20 p-4">
